@@ -33,13 +33,6 @@ FEE-CALC-05 is withdrawn: there is no largest amount, and none is built.
 - `README.md`: the status line, which says "no feature is built yet". The
   ticket's owner asked for this on 26 November 2026, although the file is
   outside the ticket's paths.
-- `pyproject.toml`: `"*.md"` joins ruff's `extend-exclude`. Also asked for by
-  the ticket's owner on 26 November 2026, and also outside the ticket's
-  paths. It loosens a check: `ruff format --check` no longer looks at the
-  Python code blocks in any Markdown file of the repository. The check does
-  not need it today, because the code blocks in this design and in the plan
-  were formatted before the exclusion was added; both local reviewers
-  reported it as high under `REVIEW.md`, and the owner chose to keep it.
 
 **Must not change**
 
@@ -49,7 +42,11 @@ FEE-CALC-05 is withdrawn: there is no largest amount, and none is built.
   waiting for FEE-API-01 and FEE-API-02 after this ticket.
 - `scripts/check-architecture.py` and `CORE_IMPORTS`. The design needs only
   `dataclasses`, which is already allowed.
-- `pyproject.toml`, apart from the ruff exclusion above: no new dependency.
+- `pyproject.toml`: no new dependency and no change to a check. An earlier
+  commit of this branch left Markdown out of ruff; a code owner asked for
+  that to be removed in review, and it was. `ruff format` therefore checks
+  the Python code blocks in this design and in the plan, and they are kept
+  formatted.
 - `core/__init__.py` stays empty. Callers import from `core.fee`.
 
 `rules-implemented.txt` gets the five rule IDs from `/hl:open-pr`, not from

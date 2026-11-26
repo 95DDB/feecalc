@@ -18,9 +18,8 @@ dev = [
 
 [tool.ruff]
 # The template's own file, kept as shipped. force-exclude makes that hold
-# for `make fmt FILE=...` too. Markdown is left out because ruff would
-# otherwise format the Python code blocks in the documents.
-extend-exclude = ["scripts/review-gate.py", "*.md"]
+# for `make fmt FILE=...` too.
+extend-exclude = ["scripts/review-gate.py"]
 force-exclude = true
 
 [tool.ruff.lint]
