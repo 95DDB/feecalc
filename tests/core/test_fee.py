@@ -1,6 +1,8 @@
 """Tests of the fee calculation, named after the rule of the specification they prove."""
 
 import dataclasses
+import math
+from fractions import Fraction
 
 import pytest
 from hypothesis import given
@@ -55,3 +57,46 @@ def test_calc_02_fraction_of_a_unit_rounds_up(amount: int, fee: int) -> None:
 def test_calc_02_fee_is_smallest_whole_number_not_below_the_rate(amount: int) -> None:
     fee = calculate_fee(amount).fee
     assert fee * 10_000 >= amount * 30 > (fee - 1) * 10_000
+
+
+@pytest.mark.parametrize(
+    ("amount", "fee"),
+    [
+        (1, 10),
+        (1_000, 10),
+        (3_000, 10),
+        (3_001, 10),
+        (3_333, 10),
+        (3_334, 11),
+        (1_666_333, 4_999),
+        (1_666_334, 5_000),
+        (1_666_666, 5_000),
+        (1_666_667, 5_000),
+        (2_000_000, 5_000),
+        (10**20, 5_000),
+        pytest.param(10**5000, 5_000, id="10^5000"),
+    ],
+)
+def test_calc_03_fee_at_and_around_the_limits(amount: int, fee: int) -> None:
+    assert calculate_fee(amount).fee == fee
+
+
+@given(positive_amounts)
+def test_calc_03_fee_is_never_outside_the_limits(amount: int) -> None:
+    assert 10 <= calculate_fee(amount).fee <= 5_000
+
+
+@given(positive_amounts)
+def test_calc_01_fee_matches_an_independent_calculation(amount: int) -> None:
+    raw_fee = math.ceil(Fraction(amount * 30, 10_000))
+    assert calculate_fee(amount).fee == min(max(raw_fee, 10), 5_000)
+
+
+@pytest.mark.parametrize(
+    ("amount", "fee", "net"),
+    [(1, 10, -9), (5, 10, -5), (9, 10, -1), (10, 10, 0), (11, 10, 1)],
+)
+def test_calc_06_net_is_answered_as_computed_when_the_fee_exceeds_the_amount(
+    amount: int, fee: int, net: int
+) -> None:
+    assert calculate_fee(amount) == FeeResult(fee=fee, net=net)
