@@ -1,0 +1,22 @@
+{
+  "id": "ai-52-fee-calculation",
+  "ticket": "AI-52",
+  "prompt": "/hl:take-ticket AI-52\n\nThe ticket as Jira returned it.\n\nSummary: Implement the fee calculation: rate, rounding up, limits, refusal and net amount\nType: Story. Status: Backlog. Assignee: none. Blocks: AI-54.\n\n## Acceptance criteria\n\n* **FEE-CALC-01**: For an accepted amount, the fee MUST be 0.30% of the amount (amount × 30 / 10,000), rounded as FEE-CALC-02 says and limited as FEE-CALC-03 says.\n* **FEE-CALC-02**: When 0.30% of the amount is not a whole number, the fee MUST be rounded up to the next whole unit.\n* **FEE-CALC-03**: The fee MUST be at least 10 units and at most 5,000 units.\n* **FEE-CALC-04**: The calculation MUST refuse, with an error and without a fee, any amount that is not an integer greater than zero.\n* **FEE-CALC-06**: For an accepted amount, the calculation MUST return the fee and the net amount together, and the net amount MUST equal the amount minus the fee.\n\n```\n--- hl-story v1 ---\nrules: FEE-CALC-01@19a6c8cc8468, FEE-CALC-02@73c3ffc02101, FEE-CALC-03@dfd942f8c838, FEE-CALC-04@aeb38e98a147, FEE-CALC-06@a75e920e5f58\ntier: 1\nspec: https://horizenlabs.atlassian.net/wiki/spaces/~6275288ef42962006fe17d70/pages/1385299969#6-fee-calculation\npaths: core/, tests/core/\nno-change: api/, web/\n--- end hl-story ---\n```\n\nAfter the plan was shown: Go native.",
+  "checks": [
+    "make verify",
+    "grep -rqE '^def ' core",
+    "grep -rqE '^(from|import) hypothesis' tests/core",
+    "test ! -e tests/core/test_placeholder.py",
+    "test ! -e api && test ! -e web"
+  ],
+  "allowed_tools": [
+    "Read",
+    "Write",
+    "Edit",
+    "Bash(make verify)",
+    "Bash(uv run --locked pytest:*)",
+    "Bash(git rm:*)",
+    "Bash(git add:*)",
+    "Bash(git commit:*)"
+  ]
+}
