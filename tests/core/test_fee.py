@@ -41,3 +41,17 @@ def test_calc_06_result_cannot_be_changed() -> None:
     result = calculate_fee(250_000)
     with pytest.raises(dataclasses.FrozenInstanceError):
         result.fee = 0  # type: ignore[misc]
+
+
+@pytest.mark.parametrize(
+    ("amount", "fee"),
+    [(10_100, 31), (10_200, 31), (12_400, 38), (7_500, 23), (5_500, 17), (20_001, 61)],
+)
+def test_calc_02_fraction_of_a_unit_rounds_up(amount: int, fee: int) -> None:
+    assert calculate_fee(amount).fee == fee
+
+
+@given(st.integers(min_value=3_334, max_value=1_666_333))
+def test_calc_02_fee_is_smallest_whole_number_not_below_the_rate(amount: int) -> None:
+    fee = calculate_fee(amount).fee
+    assert fee * 10_000 >= amount * 30 > (fee - 1) * 10_000
