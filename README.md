@@ -5,8 +5,8 @@ a transfer amount and gets back the amount, the fee and the net amount, which
 is the amount minus the fee. It exists so that one place owns the calculation,
 instead of every client computing a fee of its own.
 
-**Status:** the repository is set up and no feature is built yet. `core/` is
-an empty package with a placeholder test, which the first story replaces.
+**Status:** the fee calculation is built, in `core/fee.py`. The HTTP service
+and the demo page are not built yet.
 
 ## The fee
 
