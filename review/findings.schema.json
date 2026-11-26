@@ -1,0 +1,30 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Review findings from one AI reviewer",
+  "type": "object",
+  "required": ["reviewer", "vendor", "status", "findings"],
+  "additionalProperties": false,
+  "properties": {
+    "reviewer": { "type": "string", "minLength": 1, "description": "Name of the review job" },
+    "vendor": { "type": "string", "minLength": 1, "description": "Model vendor, for example anthropic, openai, google" },
+    "status": { "enum": ["ok", "stub", "error"], "description": "ok = the review ran; stub = no reviewer configured; error = the review failed" },
+    "findings": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "pass", "severity", "title"],
+        "additionalProperties": false,
+        "properties": {
+          "id": { "type": "string", "pattern": "^[A-Za-z0-9._-]+$", "description": "Stable within the PR; used to dismiss a finding" },
+          "pass": { "enum": ["bugs", "security", "compliance"] },
+          "severity": { "enum": ["high", "medium", "low"] },
+          "title": { "type": "string", "minLength": 1 },
+          "file": { "type": "string" },
+          "line": { "type": "integer", "minimum": 1 },
+          "detail": { "type": "string" },
+          "rule_ids": { "type": "array", "items": { "type": "string" }, "description": "Specification rules the finding relates to" }
+        }
+      }
+    }
+  }
+}

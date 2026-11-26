@@ -1,0 +1,11 @@
+# Extended regular expressions, one per line, matched against repo-relative
+# paths. A file that matches is a test file. Adjust for the project's layout.
+(^|/)tests?/
+(^|/)scenarios/
+(^|/)__tests__/
+(^|/)spec/
+_test\.[A-Za-z0-9]+$
+\.test\.[A-Za-z0-9]+$
+\.spec\.[A-Za-z0-9]+$
+(^|/)test_[^/]+\.py$
+\.t\.sol$

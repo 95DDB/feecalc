@@ -1,0 +1,46 @@
+name: Deployed check
+
+# Deploys the PR's build to a throwaway environment and tries it out.
+# Off until the repository variable DEPLOYED_CHECK_ENABLED is "true" and the
+# Makefile's deploy-ephemeral, smoke and destroy-ephemeral targets are real.
+# The agent step is a STUB; see scripts/deployed/agent-stub.sh. It is handed
+# the scenarios under scenarios/ whose rules this branch implements.
+#
+# Only scripted checks can fail this job: the smoke tests and the repro
+# scripts in tests/repro/. No production credential belongs here.
+
+on:
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: deployed-check-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  deployed-check:
+    name: deployed-check
+    if: vars.DEPLOYED_CHECK_ENABLED == 'true'
+    runs-on: ubuntu-latest
+    env:
+      REPRO_OUT: ${{ github.workspace }}/tests/repro
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Deploy to a throwaway environment
+        run: make deploy-ephemeral
+
+      - name: Smoke tests
+        run: make smoke
+
+      - name: Agent tries the build (stub)
+        run: ./scripts/deployed/agent-stub.sh
+
+      - name: Replay confirmed failures
+        run: ./scripts/deployed/run-repros.sh
+
+      - name: Destroy the environment
+        if: always()
+        run: make destroy-ephemeral

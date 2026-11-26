@@ -1,0 +1,12 @@
+# Fixture for the self-tests. Not the repository's real tier map.
+.github/   -  yes
+.claude/   -  yes
+.githooks/ -  yes
+tiers.txt  -  yes
+Makefile   -  yes
+scripts/   -  yes
+review/    -  yes
+evals/     -  no
+tests/     -  no
+docs/      -  no
+src/       2  no
