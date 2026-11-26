@@ -2,13 +2,15 @@
 
 import dataclasses
 import math
+from decimal import Decimal
 from fractions import Fraction
+from typing import Any
 
 import pytest
 from hypothesis import given
 from hypothesis import strategies as st
 
-from core.fee import FeeResult, calculate_fee
+from core.fee import FeeResult, InvalidAmountError, calculate_fee
 
 # The bounded half samples the amounts where no limit applies.
 # The other half has no upper bound.
@@ -100,3 +102,45 @@ def test_calc_06_net_is_answered_as_computed_when_the_fee_exceeds_the_amount(
     amount: int, fee: int, net: int
 ) -> None:
     assert calculate_fee(amount) == FeeResult(fee=fee, net=net)
+
+
+class _IntSubclass(int):
+    pass
+
+
+def test_calc_04_refusal_is_caught_as_a_value_error() -> None:
+    with pytest.raises(ValueError, match="greater than zero"):
+        calculate_fee(0)
+
+
+@pytest.mark.parametrize(
+    "amount", [0, -1, -480_000, pytest.param(-(10**5000), id="-10^5000")]
+)
+def test_calc_04_refuses_zero_and_below(amount: int) -> None:
+    with pytest.raises(InvalidAmountError) as refusal:
+        calculate_fee(amount)
+    assert str(refusal.value) == "amount must be greater than zero"
+
+
+@pytest.mark.parametrize(
+    "amount",
+    [True, False, 1.0, 5.5, float("nan"), "5", None, Decimal(5), _IntSubclass(100)],
+)
+def test_calc_04_refuses_what_is_not_an_integer(amount: Any) -> None:
+    with pytest.raises(InvalidAmountError) as refusal:
+        calculate_fee(amount)
+    assert (
+        str(refusal.value) == f"amount must be an integer, not {type(amount).__name__}"
+    )
+
+
+@given(st.integers(max_value=0))
+def test_calc_04_refuses_every_integer_of_zero_or_below(amount: int) -> None:
+    with pytest.raises(InvalidAmountError):
+        calculate_fee(amount)
+
+
+@given(st.one_of(st.booleans(), st.floats(), st.text(), st.binary(), st.none()))
+def test_calc_04_refuses_every_value_that_is_not_an_integer(amount: Any) -> None:
+    with pytest.raises(InvalidAmountError):
+        calculate_fee(amount)
