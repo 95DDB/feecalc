@@ -1,4 +1,4 @@
-"""Tests of the fee calculation, named after the rule of the specification they prove."""
+"""Tests of the fee calculation, each named after the rule it proves."""
 
 import dataclasses
 import math
