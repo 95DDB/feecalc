@@ -1,0 +1,40 @@
+# Tier and critical-path map for this repository.
+#
+# One line per top-level entry:  <path> <tier> <critical>
+#   path      a top-level file, or a directory ending in "/". Deeper prefixes
+#             are allowed and win over shorter ones (longest prefix matches).
+#   tier      1 = on-chain, ZK, crypto, keys   2 = services, SDKs, APIs
+#             3 = prototypes, spikes           - = not product code
+#   critical  yes = a code owner must approve changes (needs a CODEOWNERS line)
+#
+# Rules checked in CI: every top-level entry is listed, Tier 1 is always
+# critical, and every critical path has an owner in .github/CODEOWNERS.
+
+.github/        -  yes
+.claude/        -  yes
+.githooks/      -  yes
+.hl-template    -  yes
+CLAUDE.md       -  yes
+REVIEW.md       -  yes
+tiers.txt       -  yes
+Makefile        -  yes
+scripts/        -  yes
+review/         -  yes
+scenarios/      -  yes
+rules-implemented.txt  -  no
+evals/          -  no
+tests/          -  no
+docs/           -  no
+README.md       -  no
+.gitignore      -  no
+
+# The project
+core/           1  yes
+tests/core/     1  yes
+api/            2  no
+tests/api/      2  no
+web/            3  no
+tests/web/      3  no
+pyproject.toml  -  yes
+uv.lock         -  yes
+.python-version -  no

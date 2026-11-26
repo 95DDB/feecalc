@@ -1,0 +1,22 @@
+# Fixture for the self-tests.
+/.github/            @YOUR-ORG/code-owners
+/.claude/            @YOUR-ORG/code-owners
+/.githooks/          @YOUR-ORG/code-owners
+/tiers.txt           @YOUR-ORG/code-owners
+/Makefile            @YOUR-ORG/code-owners
+/scripts/            @YOUR-ORG/code-owners
+/review/             @YOUR-ORG/code-owners
+Cargo.toml           @YOUR-ORG/code-owners
+Cargo.lock           @YOUR-ORG/code-owners
+package.json         @YOUR-ORG/code-owners
+package-lock.json    @YOUR-ORG/code-owners
+pnpm-lock.yaml       @YOUR-ORG/code-owners
+yarn.lock            @YOUR-ORG/code-owners
+pyproject.toml       @YOUR-ORG/code-owners
+uv.lock              @YOUR-ORG/code-owners
+poetry.lock          @YOUR-ORG/code-owners
+requirements.txt     @YOUR-ORG/code-owners
+go.mod               @YOUR-ORG/code-owners
+go.sum               @YOUR-ORG/code-owners
+foundry.toml         @YOUR-ORG/code-owners
+remappings.txt       @YOUR-ORG/code-owners

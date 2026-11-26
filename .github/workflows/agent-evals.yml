@@ -1,0 +1,30 @@
+name: Agent evals
+
+# Regression tests for the agent's configuration. Runs when the files that
+# steer the agent change, and nightly. Today it validates the eval cases only;
+# the runner is a STUB until evals/run.sh calls a coding agent.
+# Not a required check: it does not run on every PR.
+
+on:
+  pull_request:
+    paths:
+      - CLAUDE.md
+      - REVIEW.md
+      - .claude/**
+      - evals/**
+  schedule:
+    - cron: '0 2 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  evals:
+    name: evals
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Run the eval suite
+        run: ./evals/run.sh | tee -a "$GITHUB_STEP_SUMMARY"

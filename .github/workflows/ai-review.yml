@@ -1,0 +1,78 @@
+name: AI review
+
+# Two reviewer jobs from different vendors, then a gate that blocks the merge
+# on any open high-severity finding. The reviewer jobs are STUBS until
+# review/reviewers/ holds real ones; see review/README.md.
+#
+# Repository variable AI_REVIEW_MODE: "stub" (default) or "enforce".
+
+on:
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ai-review-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  reviewer:
+    name: reviewer (${{ matrix.reviewer }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        # Two entries, two vendors. Rename when the real reviewers arrive.
+        reviewer: [reviewer-a, reviewer-b]
+    env:
+      REVIEWER: ${{ matrix.reviewer }}
+      BASE_SHA: ${{ github.event.pull_request.base.sha }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+
+      # The review rules come from the base branch, so a PR cannot weaken
+      # the review it is about to get.
+      - name: Take REVIEW.md from the base branch
+        run: git show "$BASE_SHA:REVIEW.md" > "$RUNNER_TEMP/REVIEW.md"
+
+      - name: Review (stub)
+        run: |
+          mkdir -p findings
+          ./review/reviewers/stub.sh "$REVIEWER" > "findings/$REVIEWER.json"
+
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: findings-${{ matrix.reviewer }}
+          path: findings/
+          if-no-files-found: error
+
+  review-gate:
+    name: review-gate
+    needs: reviewer
+    if: always()
+    runs-on: ubuntu-latest
+    env:
+      AI_REVIEW_MODE: ${{ vars.AI_REVIEW_MODE || 'stub' }}
+      PR_BODY: ${{ github.event.pull_request.body }}
+    steps:
+      # The gate script also comes from the base branch.
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ github.event.pull_request.base.sha }}
+
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          pattern: findings-*
+          path: findings
+          merge-multiple: true
+
+      - name: Decide
+        run: |
+          printf '%s\n' "$PR_BODY" > "$RUNNER_TEMP/pr-body.txt"
+          python3 scripts/review-gate.py \
+            --findings-dir findings \
+            --dismissals "$RUNNER_TEMP/pr-body.txt" \
+            --mode "$AI_REVIEW_MODE" | tee -a "$GITHUB_STEP_SUMMARY"

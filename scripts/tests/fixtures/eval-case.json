@@ -1,0 +1,7 @@
+{
+  "id": "example-add-endpoint",
+  "ticket": "TEMPLATE-123",
+  "prompt": "Implement the ticket: add the status endpoint described in rule EX-API-01, with its test.",
+  "checks": ["make verify"],
+  "allowed_tools": ["Read", "Edit", "Bash(make verify)"]
+}

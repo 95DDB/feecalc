@@ -1,0 +1,116 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  gates:
+    name: gates
+    runs-on: ubuntu-latest
+    env:
+      IS_TEMPLATE: ${{ github.event.repository.is_template }}
+      BASE_SHA: ${{ github.event.pull_request.base.sha }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+
+      - name: Template placeholders are gone
+        run: ./scripts/check-template-configured.sh
+
+      - name: Every top-level path has a tier
+        run: ./scripts/check-classified.sh
+
+      - name: Every critical path has a code owner
+        run: ./scripts/check-codeowners.sh
+
+      - name: The Makefile mirrors this workflow
+        run: ./scripts/check-ci-mirror.sh
+
+      - name: The list of implemented rules is well formed
+        run: ./scripts/check-implemented-rules.sh
+
+      - name: No rule left the list of implemented rules
+        if: github.event_name == 'pull_request'
+        run: ./scripts/check-implemented-rules.sh "$BASE_SHA" # ci-only
+
+      - name: Hooks and gate scripts pass their self-tests
+        run: ./scripts/tests/run.sh
+
+      - name: Tiers and critical paths touched
+        if: github.event_name == 'pull_request'
+        run: ./scripts/tier-check.sh "$BASE_SHA" >> "$GITHUB_STEP_SUMMARY" # ci-only
+
+  checks:
+    name: checks
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      # The project's own checks go here, one step each: set up the toolchain,
+      # then format, lint, build, test and scanners. Write the real commands,
+      # not make targets: one command per run line, and `cd <dir> && <command>`
+      # where a step needs another directory. Repeat every command in the
+      # Makefile's `ci` target; scripts/check-ci-mirror.sh fails when one is
+      # missing there.
+      - uses: astral-sh/setup-uv@1db35dd8eee11c5894872e0b383ae6c406cf738d # v10.4.0
+        with:
+          version: "0.13.10"
+
+      - name: Install the locked development tools
+        run: uv sync --locked
+
+      - name: Format
+        run: uv run --locked ruff format --check .
+
+      - name: Lint and security lint
+        run: uv run --locked ruff check .
+
+      - name: Guarantees of the specification that a machine can check
+        run: uv run --locked python scripts/check-architecture.py
+
+      - name: Type check
+        run: uv run --locked mypy
+
+      - name: Tests
+        run: uv run --locked coverage run -m pytest
+
+      - name: Coverage of the code
+        run: uv run --locked coverage report
+
+      - name: Coverage of the Tier 1 path is complete
+        run: uv run --locked coverage report --include='core/*' --fail-under=100
+
+      - name: Dependencies have no known vulnerability
+        run: uv run --locked pip-audit
+
+  secret-scan:
+    name: secret-scan
+    runs-on: ubuntu-latest
+    env:
+      GITLEAKS_VERSION: 8.30.1
+      GITLEAKS_SHA256: 551f6fc83ea457d62a0d98237cbad105af8d557003051f41f3e7ca7b3f2470eb
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+
+      - name: Install gitleaks at a pinned version and checksum
+        run: |
+          curl -sSfL -o "$RUNNER_TEMP/gitleaks.tgz" \
+            "https://github.com/gitleaks/gitleaks/releases/download/v${GITLEAKS_VERSION}/gitleaks_${GITLEAKS_VERSION}_linux_x64.tar.gz"
+          echo "${GITLEAKS_SHA256}  $RUNNER_TEMP/gitleaks.tgz" | sha256sum --check
+          tar -xzf "$RUNNER_TEMP/gitleaks.tgz" -C "$RUNNER_TEMP" gitleaks
+
+      - name: Scan the history for secrets
+        run: |
+          "$RUNNER_TEMP/gitleaks" git --no-banner --redact .

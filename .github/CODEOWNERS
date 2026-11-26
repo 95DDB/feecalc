@@ -1,0 +1,40 @@
+# Critical paths. A change to any of these needs a code owner's approval.
+# Keep this file in step with tiers.txt: CI fails when a critical path there
+# has no line here.
+
+# The rules themselves
+/.github/     @95DDB @lgiussan
+/.claude/     @95DDB @lgiussan
+/.githooks/   @95DDB @lgiussan
+/.hl-template @95DDB @lgiussan
+/CLAUDE.md    @95DDB @lgiussan
+/REVIEW.md    @95DDB @lgiussan
+/tiers.txt    @95DDB @lgiussan
+/Makefile     @95DDB @lgiussan
+/scripts/     @95DDB @lgiussan
+/review/      @95DDB @lgiussan
+/scenarios/   @95DDB @lgiussan
+
+# Dependency manifests and lockfiles, wherever they live
+Cargo.toml          @95DDB @lgiussan
+Cargo.lock          @95DDB @lgiussan
+package.json        @95DDB @lgiussan
+package-lock.json   @95DDB @lgiussan
+pnpm-lock.yaml      @95DDB @lgiussan
+yarn.lock           @95DDB @lgiussan
+pyproject.toml      @95DDB @lgiussan
+uv.lock             @95DDB @lgiussan
+poetry.lock         @95DDB @lgiussan
+requirements.txt    @95DDB @lgiussan
+go.mod              @95DDB @lgiussan
+go.sum              @95DDB @lgiussan
+foundry.toml        @95DDB @lgiussan
+remappings.txt      @95DDB @lgiussan
+
+# Tier 1 code goes below, one line per path, as the project adds it.
+/core/        @95DDB @lgiussan
+/tests/core/  @95DDB @lgiussan
+
+# Critical top-level files of the project (tiers.txt)
+/pyproject.toml @95DDB @lgiussan
+/uv.lock        @95DDB @lgiussan

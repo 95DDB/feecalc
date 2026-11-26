@@ -1,0 +1,49 @@
+[project]
+name = "feecalc"
+version = "0.1.0"
+description = "Tells a client what fee a transfer will cost before the transfer is made."
+requires-python = ">=3.12"
+# The code uses only the standard library at run time. Keep this list empty.
+dependencies = []
+
+[dependency-groups]
+dev = [
+    "coverage==7.17.5",
+    "hypothesis==6.170.17",
+    "mypy==2.4.1",
+    "pip-audit==2.10.1",
+    "pytest==9.2.0",
+    "ruff==0.17.6",
+]
+
+[tool.ruff]
+# The template's own file, kept as shipped. force-exclude makes that hold
+# for `make fmt FILE=...` too.
+extend-exclude = ["scripts/review-gate.py"]
+force-exclude = true
+
+[tool.ruff.lint]
+# S is the port of Bandit's security rules; BLE forbids a blind except.
+select = ["E", "W", "F", "I", "B", "UP", "SIM", "BLE", "S", "PT", "RUF"]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**" = ["S101", "S603"]
+
+[tool.mypy]
+strict = true
+files = ["."]
+exclude = ['^scripts/review-gate\.py$']
+explicit_package_bases = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
+addopts = ["--import-mode=importlib"]
+
+[tool.coverage.run]
+branch = true
+source = ["core", "api"]
+
+[tool.coverage.report]
+fail_under = 90
+show_missing = true

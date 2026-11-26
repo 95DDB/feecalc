@@ -1,0 +1,21 @@
+# Personal Claude Code settings and notes
+.claude/settings.local.json
+CLAUDE.local.md
+
+# Worktrees for parallel tickets
+.worktrees/
+
+# Review output written by CI
+findings/
+
+# Working copies of the specification and backlog proposals
+.spec/
+
+# Python environment, caches and coverage data
+.venv/
+__pycache__/
+.coverage
+.hypothesis/
+.mypy_cache/
+.pytest_cache/
+.ruff_cache/

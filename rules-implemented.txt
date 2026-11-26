@@ -1,0 +1,3 @@
+# The rules of the specification that this branch's code implements, one rule
+# ID per line, sorted. /hl:open-pr adds a ticket's rules. A scenario under
+# scenarios/ runs in the deployed check once all of its rules are listed here.
