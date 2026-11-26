@@ -304,8 +304,9 @@ class _IntSubclass(int):
     pass
 
 
-def test_calc_04_refusal_is_a_value_error() -> None:
-    assert issubclass(InvalidAmountError, ValueError)
+def test_calc_04_refusal_is_caught_as_a_value_error() -> None:
+    with pytest.raises(ValueError, match="greater than zero"):
+        calculate_fee(0)
 
 
 @pytest.mark.parametrize(
@@ -342,6 +343,10 @@ def test_calc_04_refuses_every_value_that_is_not_an_integer(amount: Any) -> None
 ```
 
 `pytest.raises` proves "without a fee": a call that raises returns nothing.
+
+Changed during implementation: the first test was `assert issubclass(InvalidAmountError, ValueError)`. It now calls the function and catches the refusal as a `ValueError`, so it proves what a caller relies on and not how the class is declared.
+
+The whole file imports `InvalidAmountError`, so Step 2 fails at import. To see each test fail on behaviour, add the bare class first and run again: 16 failed, most with `DID NOT RAISE`.
 
 - [ ] **Step 2: Run the tests and see them fail**
 
