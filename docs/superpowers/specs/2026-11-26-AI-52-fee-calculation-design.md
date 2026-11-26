@@ -85,10 +85,12 @@ implementer's; none came from the ticket.
 # core/fee.py
 class InvalidAmountError(ValueError): ...
 
+
 @dataclass(frozen=True)
 class FeeResult:
     fee: int
     net: int
+
 
 def calculate_fee(amount: int) -> FeeResult: ...
 ```

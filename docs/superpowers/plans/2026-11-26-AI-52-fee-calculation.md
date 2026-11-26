@@ -81,7 +81,9 @@ positive_amounts = st.one_of(
     ("amount", "fee"),
     [(10_000, 30), (250_000, 750), (480_000, 1_440), (1_000_000, 3_000)],
 )
-def test_calc_01_fee_is_30_basis_points_when_that_is_whole(amount: int, fee: int) -> None:
+def test_calc_01_fee_is_30_basis_points_when_that_is_whole(
+    amount: int, fee: int
+) -> None:
     assert calculate_fee(amount).fee == fee
 
 
@@ -321,7 +323,9 @@ def test_calc_04_refuses_zero_and_below(amount: int) -> None:
 def test_calc_04_refuses_what_is_not_an_integer(amount: Any) -> None:
     with pytest.raises(InvalidAmountError) as refusal:
         calculate_fee(amount)
-    assert str(refusal.value) == f"amount must be an integer, not {type(amount).__name__}"
+    assert (
+        str(refusal.value) == f"amount must be an integer, not {type(amount).__name__}"
+    )
 
 
 @given(st.integers(max_value=0))
