@@ -13,5 +13,6 @@ class FeeResult:
 
 
 def calculate_fee(amount: int) -> FeeResult:
-    fee = amount * FEE_RATE_BASIS_POINTS // BASIS_POINTS
+    # `//` rounds down, so negating before and after rounds the fee up.
+    fee = -(-amount * FEE_RATE_BASIS_POINTS // BASIS_POINTS)
     return FeeResult(fee=fee, net=amount - fee)
