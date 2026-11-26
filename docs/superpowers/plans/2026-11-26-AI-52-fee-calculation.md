@@ -13,7 +13,8 @@
 ## Global Constraints
 
 - Rules implemented: FEE-CALC-01, FEE-CALC-02, FEE-CALC-03, FEE-CALC-04, FEE-CALC-06. Nothing else.
-- Touch only `core/fee.py`, `tests/core/test_fee.py` and `tests/core/test_placeholder.py` (deleted). Do not create or change `api/`, `web/`, `scenarios/`, `scripts/`, `pyproject.toml`, `README.md` or `core/__init__.py`.
+- Touch only `core/fee.py`, `tests/core/test_fee.py`, `tests/core/test_placeholder.py` (deleted), the status line of `README.md` (Task 5) and ruff's `extend-exclude` in `pyproject.toml`. The last two are outside the ticket's paths; the ticket's owner asked for both on 26 November 2026. Do not create or change `api/`, `web/`, `scenarios/`, `scripts/` or `core/__init__.py`, and add no dependency.
+- `pyproject.toml` was changed before Task 1: `"*.md"` joined ruff's `extend-exclude`, so that `ruff format` leaves the code blocks in this plan and in the design alone.
 - `rules-implemented.txt` is updated by `/hl:open-pr`, not here.
 - `core/fee.py` imports `dataclasses` only. No float literal, no `/`, and none of the names `float`, `round`, `open`, `print`, `input`.
 - Round the fee up with `-(-amount * 30 // 10_000)`. Plain `//` rounds down.
@@ -377,6 +378,26 @@ git commit --no-gpg-sign -m "AI-52 Refuse an amount that is not an integer above
 
 ---
 
+### Task 5: The status line of the README
+
+**Files:**
+- Modify: `README.md:8-9`
+
+No test: the line is prose. It changes only after Task 4, when it is true.
+
+- [ ] **Step 1: Replace the status paragraph**
+
+New text: "**Status:** the fee calculation is built, in `core/fee.py`. The HTTP service and the demo page are not built yet."
+
+- [ ] **Step 2: Commit**
+
+```bash
+git add README.md
+git commit --no-gpg-sign -m "AI-52 Say in the README that the fee calculation is built"
+```
+
+---
+
 ## Finish
 
 - [ ] **Run the project's checks**
@@ -387,8 +408,8 @@ Expected: every command exits 0; `coverage report --include='core/*' --fail-unde
 - [ ] **Check the scope of the diff**
 
 Run: `git diff --stat main...HEAD`
-Expected: only `core/fee.py`, `tests/core/test_fee.py`, `tests/core/test_placeholder.py` and the two files under `docs/superpowers/`.
+Expected: only `core/fee.py`, `tests/core/test_fee.py`, `tests/core/test_placeholder.py`, `README.md`, `pyproject.toml` and the two files under `docs/superpowers/`.
 
 - [ ] **Hand over**
 
-If the code departed from this plan or from the design, update both files in the same branch. Then `/hl:open-pr`, which adds the five rule IDs to `rules-implemented.txt` and runs `make ci` through the pre-push hook. The PR description carries the three interface choices from the design's "Approaches" section and the note about `README.md`.
+If the code departed from this plan or from the design, update both files in the same branch. Then `/hl:open-pr`, which adds the five rule IDs to `rules-implemented.txt` and runs `make ci` through the pre-push hook. The PR description carries the three interface choices from the design's "Approaches" section, and names `README.md` and `pyproject.toml` as changes outside the ticket's paths that its owner asked for.
